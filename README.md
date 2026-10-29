@@ -25,7 +25,12 @@ Two-sided windows for the cube (`N(c,3)`):
 The upper bounds follow from the double-counting recursion of CFP (Lemma 4); we give an
 independent Zarankiewicz/C4 proof that reproduces exactly the same numbers.
 The c = 2 lower bound 13 is also already implied by the CFP table (a 2-colouring of
-`[12,12,27]` restricts to one of `[12]^3`). See `docs/` for the honest accounting.
+`[12,12,27]` restricts to one of `[12]^3`), so our own `[11]^3` colouring gives only 12.
+
+**Read `docs/LITERATURE.md` before citing anything here.** In short: our upper bounds are
+*not* new (they coincide exactly with Cooper–Fenner–Purewal Lemma 4 evaluated for the
+cube), and the only claims we believe to be unrecorded are the c = 3,4,5 lower bounds and
+the structural lemmas.
 
 ## Layout
 
