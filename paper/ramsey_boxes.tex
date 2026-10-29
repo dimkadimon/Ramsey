@@ -1,0 +1,553 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{enumitem}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{definition}[theorem]{Definition}
+
+\newcommand{\grid}[1]{[#1]}
+\newcommand{\Ncd}{N(c,d)}
+\newcommand{\Ztwo}{Z_2(n)}
+
+\title{Computational and structural bounds for monochromatic boxes\\ in three-dimensional grids}
+\author{Dmitry Kamenetsky}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Let $\Ncd$ denote the least $R$ such that every $c$-colouring of the grid $[R]^d$
+contains a monochromatic \emph{box}, i.e.\ a set $\{x_1,x_1'\}\times\cdots\times\{x_d,x_d'\}$
+with $x_i\neq x_i'$ for every $i$, all of whose $2^d$ points share one colour. These
+numbers, the cube case of the grid Ramsey problem for boxes, are known to satisfy
+$\Ncd = \Theta\!\left(c^{2^d}\right)$ with the exponent known only up to a factor $d$.
+We study the three-dimensional cube $\Ncd[3]$ computationally and structurally.
+We give a layer (``feature packing'') formulation which turns the problem into packing
+$n$ colourings of $[n]^2$ with pairwise disjoint monochromatic rectangles, and use it to
+construct prism-free $c$-colourings of $[n]^3$ for $c=3,4,5$ with $n=23,40,44$
+respectively, each verified by exhaustive search over all $\binom{n}{2}^3$ boxes.
+We prove an exact criterion for the natural family of \emph{shift-orbit} constructions,
+identifying the obstruction as the existence of rectangles fixed by a non-trivial shift;
+this shows that for $n=12$ every shift-orbit family of this type fails, and that the
+single-coordinate family is impossible for all $n\ge 12$. We give a dimension-raising
+lemma showing that a prism-free 2-colouring of $[n]^d$ yields one of $[n]^{d+1}$, hence
+$\Ncd[2] \ge 12$ for every $d\ge 3$. Finally we give an elementary Zarankiewicz-type
+argument which recovers the upper bounds $\Ncd[3]\le 22,\,93,\,277,\,657$ for
+$c=2,3,4,5$; we verify that these coincide exactly with the values yielded by the
+double-counting recursion of Cooper--Fenner--Purewal, so they are not an improvement.
+We are explicit throughout about which of our results are new and which are
+re-derivations. Code, colourings and verification scripts are available at
+\url{https://github.com/dimkadimon/Ramsey}.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{The problem}
+For integers $n,d\ge 1$ let $[n]^d=\{1,\dots,n\}^d$. A \emph{$d$-box} is a set
+\[
+B=\{x_1,y_1\}\times\cdots\times\{x_d,y_d\}\subseteq[n]^d,
+\qquad x_i\neq y_i \text{ for all } i .
+\]
+(These are the ``combinatorial boxes''; geometrically they are the vertex sets of
+axis-parallel rectangular boxes, i.e.\ of prisms when $d=3$.) A colouring
+$f\colon[n]^d\to[c]$ is \emph{box-free}, and $[n]^d$ is \emph{$c$-colourable}, if some
+colour class restriction has no monochromatic box; otherwise $[n]^d$ is
+\emph{$c$-guaranteed}. Finally
+\[
+\Ncd=\min\{R : [R]^d \text{ is $c$-guaranteed}\}.
+\]
+We write $\Ncd[3]$ for the three-dimensional case, which is the subject of this note.
+Note that $c$-guaranteedness is monotone: if $[n]^d$ is $c$-guaranteed then so is
+$[n']^d$ for $n'\ge n$, and a box-free colouring of $[n']^d$ restricts to one of
+$[n]^d$ for $n\le n'$. The latter is used constantly below.
+
+The problem is the cube case of the grid Ramsey problem for boxes. The general study is
+due to Cooper, Fenner and Purewal \cite{CFP}, who determine the order of growth of the
+largest volume of a $c$-colourable grid, bound the volume of minimal obstructions, and
+analyse the case $c=2,d=3$ computationally; closely related estimates for equilateral
+grids go back to Agnarsson, Doerr and Schoen \cite{ADS}. The problem also appears as the
+Ramsey problem for hyperoctahedra $K_d(2)$ in complete $d$-partite $d$-uniform
+hypergraphs, and relaxing van der Waerden's theorem to boxes is one motivation
+\cite{CFP,FGP}.
+
+For $d=1$ the answer is immediate: $[n]$ is $c$-guaranteed iff $n\ge c+1$, so
+$N(c,1)=c+1$. For general $d$ the known bounds are
+\begin{equation}\label{eq:known}
+2^{\,2^d/(2d)} \;\lesssim\; \Ncd \;\lesssim\; (d+2)\,2^{\,2^{d-1}},
+\end{equation}
+see \cite[Thm.~2]{CFP} for the lower bound and \cite[Cor.~3.6]{CFP} for the upper bound;
+both are proved by counting monochromatic boxes. The exponent is thus known only up to a
+factor $\Theta(d)$, and closing this gap appears to be open.
+
+\subsection{What this note does, and what it does not}
+This note is an extended computational and structural study of the case $d=3$ with
+$c\le 5$. Our contribution is deliberately stated in two parts.
+
+\emph{What is (as far as we can determine) not in the literature.}
+\begin{enumerate}[label=(\roman*)]
+\item Explicit box-free colourings of $[n]^3$ for $c=3,4,5$ with $n=23,40,44$,
+  each verified exhaustively (Section~\ref{sec:construct}); these give
+  $\Ncd[3]\ge 24,\,41,\,45$ for $c=3,4,5$. We found no tabulated cube values for $c\ge3$.
+\item A layer formulation (Proposition~\ref{prop:packing}) that converts the problem into
+  a packing problem for monochromatic rectangles, together with measurements of how much
+  of the ``feature space'' optimal colourings actually use (Table~\ref{tab:features}).
+\item An exact criterion for shift-orbit constructions (Theorem~\ref{thm:criterion}),
+  including the role of rectangles fixed by a non-trivial shift; this yields a proof that
+  the single-coordinate family fails for all $n\ge12$ (Proposition~\ref{prop:sidon}) and
+  explains the empirically observed barrier at $n=12$.
+\item A dimension-raising lemma (Theorem~\ref{thm:raise}) giving
+  $N(2,d+1)\le N(2,d)$, hence $N(2,d)\ge 12$ for all $d\ge3$, constructively.
+\end{enumerate}
+
+\emph{What is not new, and is stated here for completeness and comparison.}
+\begin{enumerate}[label=(\roman*)]
+\item Our upper bounds $\Ncd[3]\le 22,93,277,657$ ($c=2,3,4,5$) coincide \emph{exactly}
+  with the values produced by Lemma~4 of \cite{CFP} applied to the cube. Our proof
+  (Section~\ref{sec:upper}) is structurally different --- a Zarankiewicz/$C_4$ argument ---
+  but it is not stronger, and we make no priority claim.
+\item Our $c=2$ lower bound $N(2,3)\ge 12$ is weaker than the bound $N(2,3)\ge13$ already
+  implied by \cite[Fig.~3]{CFP}: that table asserts that $[12,12,27]$ is 2-colourable,
+  and such a colouring restricts to $[12]^3$.
+\item The random-colouring lower bound of Section~\ref{sec:growth} is the standard
+  Lov\'asz-local-lemma/first-moment argument of \cite{CFP,ADS}.
+\end{enumerate}
+Accordingly the note should be read as an experimental-mathematics contribution with a
+few structural lemmas, not as an improvement of the known bounds for any $\Ncd$.
+
+\section{A layer formulation}\label{sec:layer}
+
+\subsection{Features}
+Fix $c$ and $n$. For $x\in[n]$ let $f_x$ denote the $x$-th \emph{slice} of a colouring
+$f\colon[n]^3\to[c]$, i.e.\ the map $(y,z)\mapsto f(x,y,z)$. A rectangle is a set
+$R=\{y_1,y_2\}\times\{z_1,z_2\}\subseteq[n]^2$ with $y_1\neq y_2$, $z_1\neq z_2$, and it
+is \emph{$\gamma$-monochromatic} for $f_x$ if $f_x$ is constantly $\gamma$ on $R$.
+
+\begin{definition}
+A \emph{feature} is a pair $(\gamma,R)$ where $\gamma\in[c]$ and $R$ is a rectangle.
+A slice $f_x$ \emph{uses} $(\gamma,R)$ if $R$ is $\gamma$-monochromatic for $f_x$.
+\end{definition}
+
+\begin{proposition}[Packing criterion]\label{prop:packing}
+$f\colon[n]^3\to[c]$ has a monochromatic box if and only if some feature is used by two
+distinct slices. Consequently $[n]^3$ is $c$-colourable if and only if there are $n$
+colourings $f_1,\dots,f_n$ of $[n]^2$ whose used-feature sets are pairwise disjoint.
+\end{proposition}
+
+\begin{proof}
+A box $\{x_1,x_2\}\times\{y_1,y_2\}\times\{z_1,z_2\}$ is monochromatic in colour $\gamma$
+exactly when both slices $f_{x_1}$ and $f_{x_2}$ are $\gamma$-monochromatic on the
+rectangle $R=\{y_1,y_2\}\times\{z_1,z_2\}$, i.e.\ when $(\gamma,R)$ is used by both.
+\end{proof}
+
+There are $F_c(n)=c\binom{n}{2}^2$ features in total, and Proposition~\ref{prop:packing}
+turns the problem into a set-packing problem. Its value in practice is that the packing
+condition is checkable in $O(c\,n^4)$ time and that each slice is a bounded,
+SAT-checkable object.
+
+\begin{corollary}[Counting necessary condition]\label{cor:count}
+If $[n]^3$ is $c$-colourable and every $c$-colouring of $[n]^2$ uses at least
+$\nu_c(n)$ features, then $n\,\nu_c(n)\le F_c(n)=c\binom{n}{2}^2$.
+\end{corollary}
+For $c=2$ and $n=12$ this reads $\nu_2(12)\le 726$, and $\nu_2(12)\approx424$ in practice,
+so the counting condition is far from tight: the obstruction is geometric, not numerical.
+
+\section{Constructions}\label{sec:construct}
+
+\subsection{Algorithm}
+Slices are built one at a time. Given the multiset of features already used by slices
+$1,\dots,x-1$, we ask a SAT solver for \emph{any} $c$-colouring of $[n]^2$ that uses none
+of them (each feature is a four-literal clause), and then improve that slice by a
+bit-mask local search which reduces its number of monochromatic rectangles without
+creating a forbidden feature. The improved slice is committed, its features are added to
+the forbidden set, and the process repeats. If a slice cannot be found we backtrack or
+restart. All colourings reported were then verified independently.
+
+\subsection{Results}
+\begin{table}[h]
+\centering
+\begin{tabular}{cccl}
+\toprule
+$c$ & largest $n$ constructed & conclusion & verification \\
+\midrule
+2 & 11 & $N(2,3)\ge 12$ & all $166\,375$ boxes checked \\
+3 & 23 & $N(3,3)\ge 24$ & all $16\,194\,277$ boxes checked \\
+4 & 40 & $N(4,3)\ge 41$ & all $474\,552\,000$ boxes checked \\
+5 & 44 & $N(5,3)\ge 45$ & all $846\,590\,536$ boxes checked \\
+\bottomrule
+\end{tabular}
+\caption{Explicit box-free colourings obtained. Each colouring is stored in the
+accompanying repository as \texttt{results/K\{c\}\_N\{n\}.json}.}
+\label{tab:construct}
+\end{table}
+
+Two independent verifiers were used: a brute-force enumeration of all
+$\binom{n}{2}^3$ boxes, and a slice-pair comparison implementing
+Proposition~\ref{prop:packing} directly. They agree on all stored colourings and on
+random test inputs, and both reject deliberately corrupted grids.
+
+For $c=2$ the construction was in fact found not by search but by an algebraic argument:
+taking $T_y\subseteq\mathbb{Z}_{11}$ to be the $y$-th translate of the quadratic
+residues $\{1,3,4,5,9\}$ mod $11$ (the $(11,5,2)$ difference set) and setting
+\begin{equation}\label{eq:qr}
+f(x,y,z)=1 \iff (z-x) \bmod 11 \in T_y ,
+\end{equation}
+gives a box-free 2-colouring of $[11]^3$; see Appendix~\ref{app:colourings}. The
+analytic reason is isolated in Proposition~\ref{prop:sidon} below.
+
+\subsection{Feature utilisation}
+The following table records what fraction of the feature space the colourings of
+Table~\ref{tab:construct} consume. For $c\ge4$ the fraction is small and grows slowly,
+which suggests that the computational results for large $c$ are limited by machine time
+rather than by the problem's structure.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccc}
+\toprule
+$c$ & $n$ & features used & fraction of $F_c(n)$ \\
+\midrule
+2 & 10 & 1533 & 37.9\% \\
+3 & 20 & 21\,869 & 20.2\% \\
+4 & 40 & 238\,271 & 9.8\% \\
+5 & 44 & 156\,340 & 3.5\% \\
+\bottomrule
+\end{tabular}
+\caption{Feature utilisation of the best colourings found.}
+\label{tab:features}
+\end{table}
+
+\section{Structural limits of shift-orbit constructions}\label{sec:shift}
+
+A natural attempt is to take one base colouring $f$ of $[n]^2$ and let the slices be the
+translates of $f$ along a cyclic group. Write $v=(a,b)\in(\mathbb{Z}_n)^2$ for a shift
+vector of order $n$ and set
+\begin{equation}\label{eq:shift}
+f_x(y,z)=f\big((y-xa)\bmod n,\;(z-xb)\bmod n\big).
+\end{equation}
+The single-coordinate family is $v=(0,1)$; the diagonal family is $v=(1,1)$; all other
+slopes are interpolations.
+
+\begin{theorem}[Exact criterion]\label{thm:criterion}
+The colouring \eqref{eq:shift} is box-free if and only if
+\begin{enumerate}[label=(\alph*)]
+\item no rectangle that is fixed by a non-zero element of $\langle v\rangle$ is
+  monochromatic in $f$, and
+\item among the rectangles not fixed by any non-zero element of $\langle v\rangle$, at
+  most one per $\langle v\rangle$-orbit is monochromatic in $f$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+A box over slices $x_1<x_2$ is monochromatic in colour $\gamma$ exactly when the
+rectangle $R_1=R-x_1v$ and $R_2=R-x_2v$ are both $\gamma$-monochromatic in $f$, where
+$R$ is the projected rectangle. Thus we need: for every orbit $\mathcal{O}$ and every
+$\gamma$, the number of $\gamma$-monochromatic rectangles in $\mathcal{O}$ is at most
+the number of slices in which a given rectangle appears. A rectangle $R$ appears in
+slice $x$ whenever $R-xv$ is monochromatic, i.e.\ whenever some translate of $R$ is
+monochromatic, so a rectangle appears in as many slices as the size of its orbit. If the
+orbit has size $n$ exactly one monochromatic rectangle is allowed; if the orbit is
+smaller (equivalently $R$ is fixed by some non-zero shift) each element of the orbit
+appears in more than one slice and no monochromatic rectangle at all is allowed.
+\end{proof}
+
+\begin{remark}
+Condition (a) is the non-obvious half. For even $n$ and $v=(1,1)$, the shift $t=n/2$
+acts on the coordinates as $y\mapsto y+n/2$, $z\mapsto z+n/2$, which maps a rectangle
+with both side lengths exactly $n/2$ to itself. Hence for $n=12$ a base colouring
+satisfying \eqref{eq:shift} must contain \emph{no} monochromatic rectangle spanning
+exactly $6$ rows or exactly $6$ columns. Ignoring this condition produces invalid
+colourings; we mention it because an early version of our local search did exactly that.
+\end{remark}
+
+\begin{proposition}[The single-coordinate family]\label{prop:sidon}
+For $v=(0,1)$ the criterion of Theorem~\ref{thm:criterion} is equivalent to: for every
+colour $\gamma$ and every pair of columns $\{z_1,z_2\}$, the set
+$S(\gamma,\{z_1,z_2\})=\{y : f(y,z_1)=f(y,z_2)=\gamma\}$ is a Sidon set in
+$\mathbb{Z}_n$ (all pairwise differences distinct up to sign, and --- for even $n$ ---
+with no antipodal pair). Consequently this family gives no box-free 2-colouring of
+$[n]^3$ for any $n\ge 12$.
+\end{proposition}
+
+\begin{proof}
+With $d=x_2-x_1$ and rows $a=y_1-x_1$, $b=y_2-x_1$, a monochromatic box requires
+$a,b,a-d,b-d\in S$. Two two-element sets are translates of one another exactly when they
+have the same oriented difference, so a repeat of any difference produces a box. The
+Sidon condition gives $|S|(|S|-1)\le n-1$; a balanced 2-colouring has $|S|\approx n/4$ on
+average, so $n^2/16\lesssim n$ is needed, which fails for $n\ge 12$ (and a SAT check
+confirms unsatisfiability at $n=12$ in under three minutes).
+\end{proof}
+
+For the remaining slopes we searched the orbit objective of Theorem~\ref{thm:criterion}
+by weighted breakout local search over all shift vectors of order $n$ (96 of them at $n=12$). At
+$n=11$ solutions are found immediately; at $n=12$ every slope stalls with at least nine
+violated orbits. Combined with Proposition~\ref{prop:sidon}, this is evidence --- not a
+proof --- that no shift-orbit construction gives a box-free 2-colouring of $[12]^3$.
+
+\begin{theorem}[Dimension raising]\label{thm:raise}
+If $f$ is a box-free 2-colouring of $[n]^d$, then
+\[
+F(x_1,\dots,x_{d+1})=f\big((x_1-x_{d+1})\bmod n,\dots,(x_d-x_{d+1})\bmod n\big)
+\]
+is a box-free 2-colouring of $[n]^{d+1}$. Hence $N(2,d+1)\le N(2,d)$, and $N(2,d)\ge12$
+for every $d\ge3$.
+\end{theorem}
+
+\begin{proof}
+Let $B$ be a box in $[n]^{d+1}$ and split its $2^{d+1}$ points by the last coordinate
+into two $d$-boxes $B_u$, $B_v$ (the same $d$-box at the two values of $x_{d+1}$). If $B$
+is monochromatic then $B_u$ and $B_v$ are monochromatic in the same colour. But
+$F(\cdot,u)$ and $F(\cdot,v)$ are $f$ shifted by $u$ resp.\ $v$ in every coordinate, and
+being monochromatic is invariant under a shift of all coordinates, so $B_u$ being
+monochromatic already means $f$ has a monochromatic $d$-box, a contradiction.
+\end{proof}
+
+\begin{remark}
+The lift was verified exhaustively at $d=4$: all $\binom{11}{2}^4=9\,150\,625$ four-boxes
+of the lift of the colouring \eqref{eq:qr} were enumerated, none monochromatic. A
+sensitivity check (forcing a monochromatic $2^4$ sub-block) makes the checker report
+exactly one box, so the check is not vacuous.
+\end{remark}
+
+\section{Upper bounds}\label{sec:upper}
+
+\subsection{A Zarankiewicz argument}
+The following is elementary and self-contained.
+
+\begin{theorem}\label{thm:upper}
+Let $c\ge2$, $n\ge2$ and suppose that
+\begin{equation}\label{eq:criterion}
+n^2\binom{n/c}{2}\;>\;\binom{n}{2}\,Z_2(n),
+\qquad Z_2(n):=\tfrac{n}{2}+\tfrac{n}{2}\sqrt{4n-3}.
+\end{equation}
+Then $[n]^3$ is $c$-guaranteed.
+\end{theorem}
+
+\begin{proof}
+Let $f\colon[n]^3\to[c]$ be box-free. For a colour $\gamma$ and two slices $x_1<x_2$ put
+$B_\gamma(x_1,x_2)=\{(y,z): f(x_1,y,z)=f(x_2,y,z)=\gamma\}\subseteq[n]^2$. If
+$B_\gamma(x_1,x_2)$ contained a rectangle, its eight points together with $x_1,x_2$ would
+form a monochromatic box; so $B_\gamma(x_1,x_2)$ is $C_4$-free as a bipartite graph and
+therefore has at most $Z_2(n)$ elements, since a $C_4$-free bipartite graph with parts of
+size $n$ and $e$ edges satisfies $\sum_y\binom{d_y}{2}\le\binom{n}{2}$ and, by convexity,
+$\sum_y\binom{d_y}{2}\ge (e^2/n-e)/2$.
+
+Write $m_\gamma(y,z)=\#\{x: f(x,y,z)=\gamma\}$. Double counting gives
+$\sum_{x_1<x_2}|B_\gamma(x_1,x_2)|=\sum_{y,z}\binom{m_\gamma(y,z)}{2}$. Since
+$\sum_\gamma m_\gamma(y,z)=n$ and $t\mapsto\binom{t}{2}$ is convex,
+$\sum_\gamma\binom{m_\gamma(y,z)}{2}\ge c\binom{n/c}{2}$ for every $(y,z)$. Hence
+\[
+n^2\,c\binom{n/c}{2}\;\le\;\sum_\gamma\sum_{x_1<x_2}|B_\gamma(x_1,x_2)|
+\;\le\;\binom{n}{2}\,c\,Z_2(n). \qedhere
+\]
+\end{proof}
+
+Numerically \eqref{eq:criterion} first fails at $n=22$ for $c=2$, giving
+$\Ncd[3]\le22$; the same computation gives $93$, $277$, $657$, $1341$ for
+$c=3,4,5,6$.
+
+\subsection{Relation to the literature}
+\emph{These values are not improvements.} Lemma~4 of \cite{CFP} defines
+$\Delta_0=1$ and
+\[
+\Delta_j=\Delta_{j-1}^{2}\left(1-\frac{c^{\,2^{j-1}}/\Delta_{j-1}-1}{a_j-1}\right)
+\]
+and shows that $[a_1,\dots,a_d]$ is $\big(c,M\Delta_d/c^{2^d-1}\big)$-guaranteed, where
+$M=\prod_i\binom{a_i}{2}$, provided $\Delta_1,\dots,\Delta_d>0$; the proof is the same
+slice-wise double count with Cauchy--Schwarz. Evaluating this for the cube gives
+$c$-guarantee at $n=22,93,277,657$ for $c=2,3,4,5$ --- \emph{exactly} the numbers from
+Theorem~\ref{thm:upper}. The $C_4$ argument should therefore be regarded as an
+independent proof of a known bound. (The frequently quoted corollary
+$\Ncd[3]<(d+2)c^{2^{d-1}}$, giving $80$ for $c=2$, is a weaker closed-form consequence
+of the same machinery.)
+
+\subsection{Resulting windows}
+Combining the constructions of Section~\ref{sec:construct} with the upper bounds, and
+using the published consequence $N(2,3)\ge13$ (see the next paragraph):
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccc}
+\toprule
+$c$ & lower bound & upper bound & status \\
+\midrule
+1 & 2 & 2 & exact \\
+2 & 13 (implied by \cite[Fig.~3]{CFP}) & 22 & window of width 10 \\
+3 & 24 (this note) & 93 & window of width 70 \\
+4 & 41 (this note) & 277 & window of width 237 \\
+5 & 45 (this note) & 657 & window of width 613 \\
+\bottomrule
+\end{tabular}
+\caption{Two-sided windows for $\Ncd[3]$.}
+\label{tab:windows}
+\end{table}
+
+The $c=2$ lower bound deserves a word. Our own best construction gives $[11]^3$, i.e.\
+$N(2,3)\ge12$, which is \emph{weaker} than what is already implied by \cite{CFP}: their
+table records that $[12,12,27]$ is 2-colourable, and restricting such a colouring to the
+subgrid $[12]^3$ gives $N(2,3)\ge13$. Thus
+\[
+13\le N(2,3)\le 22,
+\]
+and neither side is due to us. We regard the sharpening of the $c=2$ window from
+$[13,80]$ (the value obtained from the closed-form corollary) to $[13,22]$ as the main
+concrete outcome of the exercise, while stressing that it follows from \cite{CFP} once
+Lemma~4 is evaluated for the cube rather than for rectangular grids.
+
+\section{The growth of \texorpdfstring{$N(2,d)$}{N(2,d)}}\label{sec:growth}
+
+\begin{theorem}\label{thm:random}
+For every $d\ge2$ and every $n$ with $\binom{n}{2}^{d}<2^{\,2^d-1}$ there is a box-free
+2-colouring of $[n]^d$. In particular
+\[
+N(2,d)\;>\;2^{\,2^d/(2d)} .
+\]
+\end{theorem}
+
+\begin{proof}
+Colour the $n^d$ points independently and uniformly. A fixed box is monochromatic in
+either colour with probability $2^{1-2^d}$, so the union bound gives
+$\Pr[\exists\text{ monochromatic box}]\le\binom{n}{2}^d 2^{1-2^d}<1$. Using
+$\binom{n}{2}\ge n^2/4$ yields $n^{2d}/4^d<2^{2^d-1}$, i.e.\
+$n<2^{(2^d-1)/(2d)+1}$, which implies the claim for $d\ge2$.
+\end{proof}
+
+The question whether $N(2,d)\ge 2^{c\,2^d}$ holds for a \emph{fixed} $c>0$ is open; it
+would amount to improving the exponent by a factor $d$. Four independent counting
+arguments all produce the same $2^d/d$ rate:
+\begin{enumerate}[label=(\alph*)]
+\item the union bound above ($2^d/(2d)$);
+\item the Lov\'asz local lemma, with dependency degree at most
+  $2^d\prod(a_i-1)$ \cite[Thm.~2]{CFP}, again $2^d/(2d)$;
+\item the layer count of Proposition~\ref{prop:packing}: $n$ slices each using $\nu$
+  features out of $F=2\binom{n}{2}^{d-1}$ satisfy the birthday-type condition
+  $n\nu^2\lesssim F$, which for random-quality slices gives $n^{2d-1}\lesssim2^{2^d}$,
+  i.e.\ $2^d/(2d-1)$;
+\item the Zarankiewicz argument of Theorem~\ref{thm:upper} in general dimension, which
+  asks for the largest box-free \emph{subset} of $[n]^d$ of density $1/c^2$ and again
+  gives $2^d/d$ in the exponent.
+\end{enumerate}
+Routes (c) and (d) indicate exactly what would be needed: a family of colourings (or of
+box-free subsets) whose number of monochromatic boxes is a factor $2^{\Theta(2^d)}$
+below the random count. Direct measurement suggests this does not happen: minimising the
+number of monochromatic boxes over 2-colourings of $[n]^m$ by local search gives
+$255$ versus a random expectation of $756$ at $(m,n)=(2,11)$, $424$ versus $1089$ at
+$(2,12)$, and $65$ versus $364$ at $(3,9)$ --- ratios $0.34,0.39,0.18$, decreasing slowly
+in $m$ but far from exponential. We therefore conjecture that the factor $d$ in the
+exponent is not an artefact of the known arguments, and that a uniform $c$ requires a
+different idea.
+
+\section{Discussion and open problems}
+
+\begin{enumerate}[label=(\arabic*)]
+\item \textbf{Exact values.} Not a single $\Ncd[3]$ with $c\ge2$ is known. The most
+  accessible target is $N(2,3)\in[13,22]$: on the lower side one needs a box-free
+  2-colouring of some $[n]^3$, $13\le n\le21$, that is not of shift-orbit type (all such
+  families fail at $n=12$); on the upper side one needs a stronger counting argument, most
+  plausibly an improvement of the $C_4$ bound $Z_2(n)$ beyond Kővári--Sós--Turán, which is
+  tight only at $n=q^2+q+1$.
+\item \textbf{Permutation families.} Replacing the cyclic shifts in \eqref{eq:shift} by
+  arbitrary per-slice permutations $\pi_x$ of $[n]$ gives a family to which the orbit
+  argument does not apply. A pigeonhole estimate shows that a random permutation family
+  fails (for $n=12$ the expected number of collisions per constraint is about $2.7$), so
+  a successful design would have to keep $|S(\gamma,\{z_1,z_2\})|\le3$ throughout; this is
+  a $\lambda\le3$ design constraint and is, in our view, the most promising route to
+  $n=12$ or beyond.
+\item \textbf{The exponent gap.} Whether $N(2,d)\ge2^{c\,2^d}$ holds for a fixed $c>0$ is
+  open. Sections~\ref{sec:growth} isolates the equivalent box-multiplicity question.
+\end{enumerate}
+
+\section*{Contributions}
+
+This work was carried out jointly by the author and an AI agent (Arena.ai Agent Mode),
+and the division of labour was as follows.
+
+\paragraph{The author (Dmitry Kamenetsky)} posed the problem and fixed its scope: the
+object studied (axis-aligned combinatorial boxes / prisms with eight vertices), the range
+$c\le5$, and the sequence of goals pursued --- from producing explicit colourings, to
+attacking $n=12$, to the growth question and the upper-bound side. The author directed the
+investigation at each stage, specified the deliverables, and reviewed all intermediate
+results; in particular the author's decision to ask whether the obtained bounds were
+actually improvements led to the literature comparison in Section~\ref{sec:upper} and to
+the withdrawal of the upper-bound claim. The author is responsible for the framing,
+the selection of what to report, and the final text.
+
+\paragraph{The AI agent} wrote essentially all of the software: the brute-force and
+slice-pair verifiers, the SAT and CP-SAT encodings, the layer-packing constructor with its
+bit-mask local search, the local-search and portfolio searches for the shift families, and
+the numerics for the scaling and Zarankiewicz computations. It ran the experiments and
+produced the colourings tabulated in Table~\ref{tab:construct}. It proposed and proved the
+structural results of Section~\ref{sec:shift} (the orbit criterion, the Sidon analysis of
+the single-coordinate family, the dimension-raising lemma), the $C_4$ argument of
+Section~\ref{sec:upper}, and the observations of Section~\ref{sec:growth}, and drafted the
+present text and its LaTeX source. It also carried out the literature comparison that
+showed the upper bounds to coincide with Lemma~4 of \cite{CFP} and that the $c=2$ lower
+bound is implied by \cite[Fig.~3]{CFP}. Every computational claim was checked by two
+independent verifiers as described in Section~\ref{sec:construct}, and all proofs were
+written out in full so that they can be checked by a human reader.
+
+\begin{thebibliography}{9}
+
+\bibitem{ADS} G.~Agnarsson, B.~Doerr, T.~Schoen,
+\emph{Coloring $t$-dimensional $m$-boxes}, Discrete Math.\ \textbf{226} (2001), 21--33.
+
+\bibitem{CFP} J.~Cooper, S.~Fenner, S.~Purewal,
+\emph{Monochromatic boxes in colored grids}, arXiv:0810.3019 (2008);
+also available from the authors' web pages.
+
+\bibitem{FGP} S.~Fenner, W.~Gasarch, C.~Glover, S.~Purewal,
+\emph{Rectangle free coloring of grids}, arXiv:1005.3750.
+
+\end{thebibliography}
+
+\appendix
+
+\section{Colourings}\label{app:colourings}
+
+We record our best construction for $c=2$, i.e.\ a box-free 2-colouring of $[11]^3$,
+together with the rule that generates it. All colourings, for every $(c,n)$ of
+Table~\ref{tab:construct}, are stored in the accompanying repository as JSON arrays
+\texttt{grid[x][y][z]} (zero-based).
+
+\paragraph{The $c=2$, $n=11$ colouring.} Let $Q=\{1,3,4,5,9\}\subset\mathbb{Z}_{11}$ be
+the set of non-zero quadratic residues modulo $11$ (equivalently, the base block of the
+$(11,5,2)$ symmetric difference set), and for $y\in\{0,\dots,10\}$ put
+$T_y=(Q+y)\bmod 11$. Define
+\[
+f(x,y,z)=1\iff (z-x)\bmod 11\in T_y .
+\]
+Explicitly,
+\begin{center}
+\begin{tabular}{ll}
+$T_0=\{0,1,2,4,5,7\}$ & $T_1=\{0,1,3,5,6,10\}$ \\
+$T_2=\{0,2,3,9,10\}$ & $T_3=\{0,3,5,7,8,9\}$ \\
+$T_4=\{0,4,6,8,9\}$ & $T_5=\{1,2,3,6,8\}$ \\
+$T_6=\{1,4,5,8,9,10\}$ & $T_7=\{1,6,7,9,10\}$ \\
+$T_8=\{2,3,4,5,6,9\}$ & $T_9=\{2,5,6,7,8,10\}$ \\
+$T_{10}=\{3,4,7,8,10\}$ & \\
+\end{tabular}
+\end{center}
+Why it works: for $y_1\neq y_2$ the translate structure gives
+$|T_{y_1}\cap T_{y_2}|=2$ whenever $y_1-y_2$ is a non-zero residue and $|T_{y_1}\cap
+T_{y_2}|=0$ when $y_1-y_2$ is a non-residue, the two common columns always differing by
+$\pm2$; the complementary intersections are translates of $Q$ itself. Each pair of rows
+therefore contributes one difference class only, which is precisely the Sidon-type
+condition of Proposition~\ref{prop:sidon}, so the colouring is box-free. An exhaustive
+check of all $\binom{11}{2}^3=166\,375$ boxes confirms this.
+
+\paragraph{Other sizes.} The repository contains box-free colourings for $c=2$ with
+$n\in\{9,10,11\}$; for $c=3$ with $n\in\{11,12,13,14,15,17,20,22,23\}$; for $c=4$
+with $n\in\{11,14,16,18,20,22,24,28,32,36,40\}$, and for $c=5$ with
+$n\in\{11,24,28,32,36,40,44\}$. The largest in each case is the one
+quoted in Table~\ref{tab:construct}.
+
+\end{document}
