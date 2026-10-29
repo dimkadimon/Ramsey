@@ -1,3 +1,10 @@
+# Literature check
+
+**Headline correction (round V).** Cooper--Fenner--Purewal's Lemma 4, evaluated for the
+cube, gives N(2,3) <= 22 -- i.e. exactly the number this repo previously advertised as a
+new upper bound. It was never new. Their Lemma 15 is also the 'packing criterion' used
+here. Our only genuine improvement is N(2,3) <= 21, from an exact two-level convexity
+bound on phi_2(21) plus integrality; see docs/UPPER_BOUND.md.
 # Literature check: has anyone improved bounds for N(c,3)?
 
 **Short answer: not that we can find — and, more importantly, our own claimed improvements

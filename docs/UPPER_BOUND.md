@@ -1,149 +1,112 @@
-# A Zarankiewicz argument for cube grid-Ramsey numbers
+# Upper bounds for N(c,3): the packing inequality, and N(2,3) ≤ 21
 
-**Result.** Write `N(c,d)` for the least R such that every c-colouring of `[R]^d` has a
-monochromatic box. Then
+*Supersedes the round-IV version of this file, which claimed the value 22 as new. 22 is
+not new: it is exactly what Lemma 4 of Cooper–Fenner–Purewal (SIAM J. Discrete Math. 22
+(2008), arXiv:0810.3019) gives for the cube. The value 21 is new.*
 
-```
-N(2,3) ≤ 22,   N(3,3) ≤ 93,   N(4,3) ≤ 277,   N(5,3) ≤ 657,
-```
+## 1. Conventions
 
-against the published bounds `N(c,3) < (d+2)c^{2^{d−1}} = 5c⁴` (Cooper–Fenner–Purewal,
-Cor. 3.6), i.e. 80, 405, 1280, 3125. The argument is elementary and self-contained.
+`N(c,d)` = the least `R` such that every `c`-colouring of `[R]^d` contains a monochromatic
+**box** (2 points per coordinate, so `2^d` vertices, all one colour). So `N(c,d) ≤ m`
+means "every `c`-colouring of `[m]^d` has a monochromatic box".
 
-## 1. The argument
+## 2. Features and the packing inequality
 
-Let `f : [n]^d → [c]` be a colouring with **no monochromatic box**.
+A **feature** is a triple `(colour, row-pair {y1,y2}, column-pair {z1,z2})`. Slice `x`
+**uses** it when all four cells `(x,y1,z1),(x,y1,z2),(x,y2,z1),(x,y2,z2)` have that colour.
 
-**Step 1 (each pair of slices gives a box-free set).** Fix a colour `γ` and two distinct
-slices `x₁ ≠ x₂` (slices = hyperplanes `x₁ = const`). Put
+*Fact 1.* A colouring of `[n]^3` has **no** monochromatic box **iff** no feature is used by
+two different slices. (The 8 vertices of a box are the two slices' copies of one rectangle.)
 
-```
-B_γ(x₁,x₂) = { (y₂,…,y_d) ∈ [n]^{d−1} : f(x₁,y) = γ = f(x₂,y) }.
-```
-
-If `B_γ(x₁,x₂)` contained a `(d−1)`-box, then together with the two slice coordinates that
-box would give `2^d` grid points all of colour `γ` — a monochromatic box. Hence:
-
-> `B_γ(x₁,x₂)` contains **no** `(d−1)`-box.
-
-**Step 2 (double count).** With `m_γ(y) = #{x : f(x,y) = γ}`,
+Hence a box-free colouring needs the `n` slices to use **pairwise disjoint** features, and
+since a slice uses exactly as many features as it has monochromatic rectangles,
 
 ```
-Σ_{x₁<x₂} |B_γ(x₁,x₂)| = Σ_{y ∈ [n]^{d−1}} C(m_γ(y), 2).                        (1)
+n * phi_c(n)  <=  c * C(n,2)^2          (P)
 ```
 
-**Step 3 (convexity, lower bound).** At each `y` the multiplicities satisfy
-`Σ_γ m_γ(y) = n`, and `t ↦ C(t,2)` is convex, so
+where `phi_c(n)` = least number of monochromatic axis-parallel rectangles in a
+`c`-colouring of `[n]^2`. This is Lemma 15 of CFP in packing language.
+
+## 3. The 2-D bound
+
+Let `k_y` = number of colour-0 cells in row `y`, and for each of the `Np = C(n,2)` column
+pairs `j` let `a_j` / `b_j` = number of rows where both cells of `j` are 0 / 1. Then
 
 ```
-Σ_γ C(m_γ(y), 2) ≥ c · C(n/c, 2).
+R = sum_j [C(a_j,2) + C(b_j,2)],   sum_j a_j = T0 = sum_y C(k_y,2),
+                                   sum_j b_j = T1 = sum_y C(n-k_y,2)
 ```
 
-Summing (1) over the `c` colours:
+Two levels of convexity, both *exact in the integers* (distribute as evenly as possible,
+function `mu(T,bins)`):
 
 ```
-Σ_γ Σ_{x₁<x₂} |B_γ(x₁,x₂)| ≥ n^{d−1} · c · C(n/c, 2).                          (2)
+R >= mu(T0,Np) + mu(T1,Np),      T0+T1 >= n * min_k [C(k,2)+C(n-k,2)]
 ```
 
-**Step 4 (upper bound).** By Step 1 each `B_γ(x₁,x₂)` is a box-free subset of
-`[n]^{d−1}`; let `Z_{d−1}(n)` be the maximum size of such a subset. There are `C(n,2)`
-slice pairs and `c` colours:
+## 4. Why n = 21
+
+For `n = 21`: each row contributes `C(k,2)+C(21-k,2) >= 100`, and this is an **even**
+number, so either `T0+T1 = 2100` or `T0+T1 >= 2102`.
+
+* If `T0+T1 = 2100`, every row has `k_y ∈ {10,11}`, so `(T0,T1) = (945+10m, 1155-10m)`
+  for an integer `m`. Then the minimum is at `m = 10,11`:
+  `mu(1045,210) + mu(1055,210) = 2080 + 2125 = 4205`.
+* If `T0+T1 >= 2102`, the value is at least `2*mu(1051,210) = 4210`.
+
+So `phi_2(21) >= 4205`. Now (P) with `c=2, n=21` needs
 
 ```
-Σ_γ Σ_{x₁<x₂} |B_γ(x₁,x₂)| ≤ C(n,2) · c · Z_{d−1}(n).                          (3)
+21 * 4205 = 88305  <=  2 * C(21,2)^2 = 88200,     false.
 ```
 
-**Step 5 (conclude).** Combining (2) and (3):
+**Therefore `[21]^3` is 2-uncolorable, i.e. `N(2,3) ≤ 21`.**  Verify with
+`python3 code/final_bound.py`.
 
-```
-n^{d−1} · C(n/c, 2)  ≤  C(n,2) · Z_{d−1}(n).                                   (4)
-```
+### Why 21 is the wall (and where the one unit comes from)
 
-If (4) fails, no box-free c-colouring of `[n]^d` exists, i.e. `[n]^d` is c-guaranteed.
+The *continuous* form, with `T0 = T1 = 1050`, gives only `phi_2(21) >= 4200`, and
+`21 * 4200 = 88200`, **exactly** the number of features available — a perfect packing.
+`21 = 4^2+4+1` is a projective-plane order and the extremal Zarankiewicz value
+`Z_2(21) = 105 = 5*21` is attained by the plane of order 4. So:
 
-## 2. The 3-dimensional case
+* no refinement *within* the continuous/C4 counting scheme can pass `n = 21`;
+* the improvement is precisely an **integrality** effect: `T0 = T1 = 1050` is not
+  attainable by an integer row composition, and the least integer excess costs 105
+  features out of 88200.
 
-For `d = 3`, `Z₂(n)` is the largest number of edges in a `C₄`-free bipartite graph with both
-parts of size `n` (Zarankiewicz number `z(n,n;2,2)`). The elementary Kővári–Sós–Turán bound
-gives
+## 5. Other c
 
-```
-Z₂(n) ≤ n/2 + (n/2)·√(4n−3).
-```
+The same computation with `c` colours: (P) first fails at `n = 93, 277, 657` for
+`c = 3,4,5` — the same thresholds as CFP Lemma 4. So this method improves **only** `c=2`.
 
-*Proof of the bound.* For each pair of columns `{z₁,z₂}` at most one row is adjacent to both
-(otherwise a `C₄`), so `Σ_y C(d_y,2) ≤ C(n,2)`. By convexity
-`Σ_y C(d_y,2) ≥ n·C(e/n,2) = (e²/n − e)/2`, hence `e² − ne − n²(n−1) ≤ 0`. ∎
-
-So (4) becomes the explicit necessary condition
-
-```
-n² · C(n/2, 2)  ≤  C(n,2) · [ n/2 + (n/2)√(4n−3) ]        (c = 2)              (5)
-```
-
-which fails first at `n = 22`:
-
-| n | LHS `n²C(n/2,2)` | RHS `C(n,2)Z₂(n)` | verdict |
+| c | least n excluded by (P) | CFP Lemma 4 | improvement |
 |---|---|---|---|
-| 20 | 18 000 | 18 572 | consistent |
-| 21 | 21 995 | 22 050 | consistent |
-| **22** | **26 620** | **25 964** | **contradiction** |
+| 2 | 21 | 22 | **1** |
+| 3 | 93 | 93 | none |
+| 4 | 277 | 277 | none |
+| 5 | 657 | 657 | none |
 
-**Hence `N(2,3) ≤ 22`.** ∎
+## 6. Reproducing CFP itself
 
-More colours, same criterion:
-
-| c | threshold from (4)+(KST) | published `5c⁴` |
-|---|---|---|
-| 2 | **22** | 80 |
-| 3 | **93** | 405 |
-| 4 | **277** | 1280 |
-| 5 | **657** | 3125 |
-| 6 | 1341 | 6480 |
-| 7 | 2461 | 12005 |
-| 8 | 4173 | 20480 |
-
-## 3. Numerical validation of every step
-
-Checked against the explicit prism-free 2-colouring of `[11]³` (`prism/results/K2_N11.json`),
-where all quantities can be computed exactly:
-
-* identity (1): `Σ_{x₁<x₂}|B_γ| = 1540` vs `Σ_y C(m_γ,2) = 1540` for `γ = 0`, and
-  `1485 = 1485` for `γ = 1` — exact match;
-* Step 1: `max_{x₁,x₂}|B_γ(x₁,x₂)| = 28 ≤ Z₂(11) = 40.7` ✓;
-* Step 3: `Σ_γ Σ|B_γ| = 3025 ≥ n²·(n²/4 − n/2) = 2995` ✓;
-* (5) holds at `n = 11` (`2995 ≤ 4479`), as it must for a colouring that exists, and fails
-  at `n = 22`.
-
-## 4. What this does and does not give
-
-* It **halves the window**: combined with the explicit colouring of `[11]³`,
-  `12 ≤ N(2,3) ≤ 22`.
-* It gives the first two-sided rigorous windows for `c = 3,4,5` as well (see the summary
-  report).
-* It does **not** settle `N(2,3)`. Closing `12…22` needs either an explicit 2-colouring of
-  some `[n]³` with `12 ≤ n ≤ 22`, or a much stronger upper-bound technique.
-* The argument is *shape-agnostic*: `Z₂(n)` is only tight at `n = q²+q+1` (projective
-  planes), so the KST bound cannot be improved much without exact Zarankiewicz numbers.
-
-## 5. General d, and a reduction relevant to the uniform-c question
-
-For general `d`, (4) reads
+`code/cfp_check.py` re-derives CFP's Lemma 4 (their printed form of the `Δ` recursion is
+singular at `j=1`; the recurrence used is the one that follows from their own proof),
 
 ```
-[n]^d is c-guaranteed  whenever  Z_{d−1}(n) < n^{d−1}/c²,                      (6)
+Delta_0 = 1,  Delta_j = Delta_{j-1} * (a_j*Delta_{j-1} - c^{2^{j-1}}) / (a_j - 1)
 ```
 
-i.e. whenever no box-free **subset** of `[n]^{d−1}` has density at least `1/c²`.
+with `[a_1..a_d]` `c`-guaranteed if all `Delta_j > 0` and `M*Delta_d >= c^{2^d-1}`,
+`M = prod C(a_i,2)`. This reproduces their cube thresholds `22, 93, 277` for `c=2,3,4`,
+and at `d=1,2` gives 4 and 6 (valid but not sharp; the truth is 3 and 5), which is the
+expected behaviour of a valid bound.
 
-Since a prism-free c-colouring of `[n]^d` has c colour classes, each a box-free subset of
-`[n]^d` of density `≈ 1/c`, we get: *explicit low-density box-free subsets are exactly what
-blocks this upper-bound method*. And the dimension-raising lemma supplies them — the
-`[11]³` colouring lifts to box-free subsets of `[11]^m` of density `1/2` for every `m`.
+## 7. Bottom line
 
-So (6) can only beat the known `(d+2)2^{2^{d−1}}` bound if the box-free-subset density
-threshold grows slowly with `d`. By the random-subset argument, density `p` box-free subsets
-of `[n]^m` exist whenever `C(n,2)^m p^{2^m} < 1`, i.e. `n ≲ p^{−2^m/(2m)}·2^{...}`; with
-`p = 1/c²` this is `n ≲ (c²)^{2^m/(2m)} = c^{2^{m+1}/m}` — exponent `2^d/d` again. So the
-method is not strong enough for a uniform `c`; it reproduces the same exponent, as one
-expects.
+```
+13 <= N(2,3) <= 21        (was [13,22]; lower bound due to CFP Fig. 3)
+24 <= N(3,3) <= 93
+41 <= N(4,3) <= 277
+45 <= N(5,3) <= 657
+```

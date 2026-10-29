@@ -17,13 +17,19 @@ Two-sided windows for the cube (`N(c,3)`):
 | c | lower bound | witness | upper bound |
 |---|-------------|---------|-------------|
 | 1 | 2 | — | 2 (exact) |
-| 2 | 13 | literature (CFP Fig. 3, row 12/12/27) | 22 |
+| 2 | 13 | literature (CFP Fig. 3, row 12/12/27) | **21** (new, Thm 5.2) |
 | 3 | **24** | our `[23]^3` colouring | 93 |
 | 4 | **41** | our `[40]^3` colouring | 277 |
 | 5 | **45** | our `[44]^3` colouring | 657 |
 
-The upper bounds follow from the double-counting recursion of CFP (Lemma 4); we give an
-independent Zarankiewicz/C4 proof that reproduces exactly the same numbers.
+The c = 3,4,5 upper bounds follow from the double-counting recursion of CFP (Lemma 4); we
+give an independent Zarankiewicz/C4 proof that reproduces exactly the same numbers.
+The **c = 2 upper bound 21 is new** (CFP give 22): it comes from CFP's Lemma 15 in packing
+form, `n*phi_c(n) <= c*C(n,2)^2`, together with an exact two-level convexity bound
+`phi_2(21) >= 4205`. Then `21*4205 = 88305 > 88200 = 2*C(21,2)^2`. The obstruction is the
+projective plane of order 4 (21 = 4^2+4+1): the continuous form of the argument is exactly
+tight at n = 21 and the improvement is entirely an integrality effect. See
+`docs/UPPER_BOUND.md` and `code/final_bound.py`.
 The c = 2 lower bound 13 is also already implied by the CFP table (a 2-colouring of
 `[12,12,27]` restricts to one of `[12]^3`), so our own `[11]^3` colouring gives only 12.
 

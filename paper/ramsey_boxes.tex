@@ -41,10 +41,17 @@ identifying the obstruction as the existence of rectangles fixed by a non-trivia
 this shows that for $n=12$ every shift-orbit family of this type fails, and that the
 single-coordinate family is impossible for all $n\ge 12$. We give a dimension-raising
 lemma showing that a prism-free 2-colouring of $[n]^d$ yields one of $[n]^{d+1}$, hence
-$\Ncd[2] \ge 12$ for every $d\ge 3$. Finally we give an elementary Zarankiewicz-type
-argument which recovers the upper bounds $\Ncd[3]\le 22,\,93,\,277,\,657$ for
-$c=2,3,4,5$; we verify that these coincide exactly with the values yielded by the
-double-counting recursion of Cooper--Fenner--Purewal, so they are not an improvement.
+$\Ncd[2] \ge 12$ for every $d\ge 3$. Finally we sharpen the upper bound for the
+two-colour cube. Writing $\varphi_c(n)$ for the least number of monochromatic rectangles
+in a $c$-colouring of $[n]^2$, the number of features a slice must use gives the
+necessary condition $n\varphi_c(n)\le c\binom{n}{2}^{2}$ (Lemma~15 of
+Cooper--Fenner--Purewal in packing language). Two exact levels of convexity give
+$\varphi_2(21)\ge 4205$, so a box-free $2$-colouring of $[21]^3$ would need
+$21\cdot 4205=88305$ features out of the $88200$ available. Hence
+$\Ncd[3]\le 21$ for $c=2$, improving the bound $22$ obtained by the
+double-counting recursion of Cooper--Fenner--Purewal. The obstruction is exactly the
+projective plane of order $4$: at $n=21$ the continuous form of the argument is tight,
+and the improvement comes from the integrality of the row composition.
 We are explicit throughout about which of our results are new and which are
 re-derivations. Code, colourings and verification scripts are available at
 \url{https://github.com/dimkadimon/Ramsey}.
@@ -107,14 +114,21 @@ $c\le 5$. Our contribution is deliberately stated in two parts.
   explains the empirically observed barrier at $n=12$.
 \item A dimension-raising lemma (Theorem~\ref{thm:raise}) giving
   $N(2,d+1)\le N(2,d)$, hence $N(2,d)\ge 12$ for all $d\ge3$, constructively.
+\item \textbf{An improved upper bound for the two-colour cube}: $N(2,3)\le21$
+  (Theorem~\ref{thm:upper2}), against the value $22$ obtained from Lemma~4 of
+  \cite{CFP}. The packing condition $n\varphi_c(n)\le c\binom{n}{2}^2$ is Lemma~15 of
+  \cite{CFP}; what is new is bounding $\varphi_2(21)$ by two exact levels of convexity
+  and using the integrality of the row composition, which is what makes $n=21$ fail
+  (Remark~\ref{rem:pp}). The same computation gives nothing new for $c\ge3$.
 \end{enumerate}
 
 \emph{What is not new, and is stated here for completeness and comparison.}
 \begin{enumerate}[label=(\roman*)]
-\item Our upper bounds $\Ncd[3]\le 22,93,277,657$ ($c=2,3,4,5$) coincide \emph{exactly}
-  with the values produced by Lemma~4 of \cite{CFP} applied to the cube. Our proof
-  (Section~\ref{sec:upper}) is structurally different --- a Zarankiewicz/$C_4$ argument ---
-  but it is not stronger, and we make no priority claim.
+\item The Zarankiewicz bound $\Ncd[3]\le 22,93,277,657$ ($c=2,3,4,5$) coincides
+  \emph{exactly} with the values produced by Lemma~4 of \cite{CFP} applied to the cube.
+  Our proof (Section~\ref{sec:upper}) is structurally different --- a Zarankiewicz/$C_4$
+  argument --- but it is not stronger, and we make no priority claim. Only the $c=2$
+  value is improved, and only by one, in Theorem~\ref{thm:upper2}.
 \item Our $c=2$ lower bound $N(2,3)\ge 12$ is weaker than the bound $N(2,3)\ge13$ already
   implied by \cite[Fig.~3]{CFP}: that table asserts that $[12,12,27]$ is 2-colourable,
   and such a colouring restricts to $[12]^3$.
@@ -355,20 +369,73 @@ Numerically \eqref{eq:criterion} first fails at $n=22$ for $c=2$, giving
 $\Ncd[3]\le22$; the same computation gives $93$, $277$, $657$, $1341$ for
 $c=3,4,5,6$.
 
-\subsection{Relation to the literature}
-\emph{These values are not improvements.} Lemma~4 of \cite{CFP} defines
-$\Delta_0=1$ and
+\subsection{A packing bound and an improvement for $c=2$}\label{sec:packbound}
+
+In the feature language of Section~\ref{sec:packing}, Lemma~15 of \cite{CFP} says that
+the $n$ slices of a box-free colouring must use \emph{pairwise disjoint} features. Since a
+slice uses exactly as many features as it has monochromatic rectangles,
+\begin{equation}\label{eq:pack}
+n\,\varphi_c(n)\;\le\;c\binom{n}{2}^{2}
+\end{equation}
+is necessary for a box-free $c$-colouring of $[n]^3$ to exist, where $\varphi_c(n)$ is the
+least number of monochromatic rectangles in a $c$-colouring of $[n]^{2}$.
+Cooper--Fenner--Purewal bound $\varphi_c$ through their recursion. For $c=2$ we bound
+$\varphi_2(n)$ by two exact levels of convexity, and the integrality of the intermediate
+composition decides $n=21$.
+
+\begin{theorem}\label{thm:upper2}
+$\varphi_2(21)\ge 4205$. Consequently $[21]^3$ is $2$-guaranteed, i.e.\ $\Ncd[3]\le21$
+for $c=2$.
+\end{theorem}
+
+\begin{proof}
+Let $k_y$ be the number of $0$-cells in row $y$ of a $2$-colouring of $[21]^2$. For each
+of the $\binom{21}{2}=210$ column pairs $j$ let $a_j$ (resp.\ $b_j$) be the number of rows
+whose two cells in $j$ are both $0$ (resp.\ both $1$). The number of monochromatic
+rectangles is
 \[
-\Delta_j=\Delta_{j-1}^{2}\left(1-\frac{c^{\,2^{j-1}}/\Delta_{j-1}-1}{a_j-1}\right)
+R=\sum_j\Bigl[\binom{a_j}{2}+\binom{b_j}{2}\Bigr],
+\qquad
+\sum_j a_j=T_0:=\sum_y\binom{k_y}{2},\quad
+\sum_j b_j=T_1:=\sum_y\binom{21-k_y}{2}.
 \]
-and shows that $[a_1,\dots,a_d]$ is $\big(c,M\Delta_d/c^{2^d-1}\big)$-guaranteed, where
-$M=\prod_i\binom{a_i}{2}$, provided $\Delta_1,\dots,\Delta_d>0$; the proof is the same
-slice-wise double count with Cauchy--Schwarz. Evaluating this for the cube gives
-$c$-guarantee at $n=22,93,277,657$ for $c=2,3,4,5$ --- \emph{exactly} the numbers from
-Theorem~\ref{thm:upper}. The $C_4$ argument should therefore be regarded as an
-independent proof of a known bound. (The frequently quoted corollary
-$\Ncd[3]<(d+2)c^{2^{d-1}}$, giving $80$ for $c=2$, is a weaker closed-form consequence
-of the same machinery.)
+For integers $x_j\ge0$ with $\sum_j x_j=T$ convexity gives
+$\sum_j\binom{x_j}{2}\ge\mu(T,210)$, where $\mu$ is attained by distributing $T$ as evenly
+as possible over the $210$ bins; hence $R\ge\mu(T_0,210)+\mu(T_1,210)$. Each row
+contributes $\binom{k}{2}+\binom{21-k}{2}\ge\binom{10}{2}+\binom{11}{2}=100$, an even
+number. Therefore either $T_0+T_1=2100$, in which case every row has $k_y\in\{10,11\}$
+and $(T_0,T_1)=(945+10m,\,1155-10m)$ for some integer $0\le m\le21$; or $T_0+T_1\ge2102$.
+In the first case $\mu(T_0,210)+\mu(T_1,210)$ is minimised at $m=10,11$, where it equals
+$\mu(1045,210)+\mu(1055,210)=2080+2125=4205$; in the second it is at least
+$2\mu(1051,210)=4210$. Hence $R\ge4205$.
+Finally \eqref{eq:pack} at $c=2$, $n=21$ would require
+$21\cdot4205=88305\le2\binom{21}{2}^{2}=88200$, which fails.
+\end{proof}
+
+\begin{remark}\label{rem:pp}
+The obstruction is a projective plane. The continuous form of the argument ($T_0=T_1=1050$)
+gives only $\varphi_2(21)\ge4200$ and $21\cdot4200=88200$, \emph{exactly} the number of
+features available; $21=4^2+4+1$ is a projective-plane order and the extremal Zarankiewicz
+value $Z_2(21)=105=5\cdot21$ is attained by the plane of order $4$, which is also the
+extremal example for the sharpness of the K\H{o}vari--S\'os--Tur\'an bound in the case
+$t=2$. So no refinement of the continuous count can pass $n=21$: the improvement above
+comes precisely from the fact that $T_0=T_1=1050$ is not attainable by an integer row
+composition, and the least integer excess costs $105$ features.
+\end{remark}
+
+\begin{remark}
+Applying the same computation with $c$ colours, \eqref{eq:pack} first fails at
+$n=93,277,657$ for $c=3,4,5$ --- the same thresholds as Lemma~4 of \cite{CFP}, so
+Theorem~\ref{thm:upper2} is an improvement only for $c=2$.
+\end{remark}
+
+\subsection{Relation to the literature}
+The Zarankiewicz Theorem~\ref{thm:upper} is \emph{not} an improvement: it reproduces
+Lemma~4 of \cite{CFP} applied to the cube (the values $22,93,277,657$ for $c=2,3,4,5$).
+Theorem~\ref{thm:upper2} improves the $c=2$ value from $22$ to $21$; we found no
+post-2008 improvement of the cube bounds in the literature, and \cite{CFP} itself remarks
+that ``the case of $c=2$ and $d=3$'' is where the interesting computational questions
+remain open.
 
 \subsection{Resulting windows}
 Combining the constructions of Section~\ref{sec:construct} with the upper bounds, and
@@ -381,7 +448,7 @@ using the published consequence $N(2,3)\ge13$ (see the next paragraph):
 $c$ & lower bound & upper bound & status \\
 \midrule
 1 & 2 & 2 & exact \\
-2 & 13 (implied by \cite[Fig.~3]{CFP}) & 22 & window of width 10 \\
+2 & 13 (implied by \cite[Fig.~3]{CFP}) & \textbf{21} (Thm.~\ref{thm:upper2}) & window of width 8 \\
 3 & 24 (this note) & 93 & window of width 70 \\
 4 & 41 (this note) & 277 & window of width 237 \\
 5 & 45 (this note) & 657 & window of width 613 \\
@@ -396,12 +463,13 @@ $N(2,3)\ge12$, which is \emph{weaker} than what is already implied by \cite{CFP}
 table records that $[12,12,27]$ is 2-colourable, and restricting such a colouring to the
 subgrid $[12]^3$ gives $N(2,3)\ge13$. Thus
 \[
-13\le N(2,3)\le 22,
+13\le N(2,3)\le 21,
 \]
-and neither side is due to us. We regard the sharpening of the $c=2$ window from
-$[13,80]$ (the value obtained from the closed-form corollary) to $[13,22]$ as the main
-concrete outcome of the exercise, while stressing that it follows from \cite{CFP} once
-Lemma~4 is evaluated for the cube rather than for rectangular grids.
+The lower bound is not due to us. The upper bound is Theorem~\ref{thm:upper2}; the
+previous best value, $22$, follows from Lemma~4 of \cite{CFP} (and is reproduced by our
+Zarankiewicz argument), while the closed-form corollary of \cite{CFP} gives only $80$.
+We therefore regard $[13,21]$ as the concrete outcome for $c=2$, with the improvement over
+\cite{CFP} being the single unit obtained from Remark~\ref{rem:pp}.
 
 \section{The growth of \texorpdfstring{$N(2,d)$}{N(2,d)}}\label{sec:growth}
 
@@ -450,7 +518,7 @@ different idea.
 
 \begin{enumerate}[label=(\arabic*)]
 \item \textbf{Exact values.} Not a single $\Ncd[3]$ with $c\ge2$ is known. The most
-  accessible target is $N(2,3)\in[13,22]$: on the lower side one needs a box-free
+  accessible target is $N(2,3)\in[13,21]$: on the lower side one needs a box-free
   2-colouring of some $[n]^3$, $13\le n\le21$, that is not of shift-orbit type (all such
   families fail at $n=12$); on the upper side one needs a stronger counting argument, most
   plausibly an improvement of the $C_4$ bound $Z_2(n)$ beyond Kővári--Sós--Turán, which is
@@ -490,10 +558,15 @@ structural results of Section~\ref{sec:shift} (the orbit criterion, the Sidon an
 the single-coordinate family, the dimension-raising lemma), the $C_4$ argument of
 Section~\ref{sec:upper}, and the observations of Section~\ref{sec:growth}, and drafted the
 present text and its LaTeX source. It also carried out the literature comparison that
-showed the upper bounds to coincide with Lemma~4 of \cite{CFP} and that the $c=2$ lower
-bound is implied by \cite[Fig.~3]{CFP}. Every computational claim was checked by two
-independent verifiers as described in Section~\ref{sec:construct}, and all proofs were
-written out in full so that they can be checked by a human reader.
+showed that the Zarankiewicz upper bounds coincide with Lemma~4 of \cite{CFP}, that the
+$c=2$ lower bound is implied by \cite[Fig.~3]{CFP}, and that the earlier draft's claim of
+$N(2,3)\le22$ as a new result was wrong; the improvement to $21$ (Theorem~\ref{thm:upper2})
+was found by the AI agent, which also wrote the standalone certificate
+\texttt{code/final\_bound.py} for it; that certificate is short enough to be checked by
+hand and is the artifact the author should verify before submission. Every computational
+claim was checked by two independent verifiers as described in
+Section~\ref{sec:construct}, and all proofs are written out in full so that they can be
+checked by a human reader.
 
 \begin{thebibliography}{9}
 
