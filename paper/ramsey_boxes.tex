@@ -26,34 +26,37 @@
 \maketitle
 
 \begin{abstract}
-Let $\Ncd$ denote the least $R$ such that every $c$-colouring of the grid $[R]^d$
-contains a monochromatic \emph{box}, i.e.\ a set $\{x_1,x_1'\}\times\cdots\times\{x_d,x_d'\}$
-with $x_i\neq x_i'$ for every $i$, all of whose $2^d$ points share one colour. These
-numbers, the cube case of the grid Ramsey problem for boxes, are known to satisfy
-$\Ncd = \Theta\!\left(c^{2^d}\right)$ with the exponent known only up to a factor $d$.
-We study the three-dimensional cube $\Ncd[3]$ computationally and structurally.
-We give a layer (``feature packing'') formulation which turns the problem into packing
-$n$ colourings of $[n]^2$ with pairwise disjoint monochromatic rectangles, and use it to
-construct prism-free $c$-colourings of $[n]^3$ for $c=3,4,5$ with $n=23,40,44$
-respectively, each verified by exhaustive search over all $\binom{n}{2}^3$ boxes.
-We prove an exact criterion for the natural family of \emph{shift-orbit} constructions,
-identifying the obstruction as the existence of rectangles fixed by a non-trivial shift;
-this shows that for $n=12$ every shift-orbit family of this type fails, and that the
-single-coordinate family is impossible for all $n\ge 12$. We give a dimension-raising
-lemma showing that a prism-free 2-colouring of $[n]^d$ yields one of $[n]^{d+1}$, hence
-$\Ncd[2] \ge 12$ for every $d\ge 3$. Finally we sharpen the upper bound for the
-two-colour cube. Writing $\varphi_c(n)$ for the least number of monochromatic rectangles
-in a $c$-colouring of $[n]^2$, the number of features a slice must use gives the
-necessary condition $n\varphi_c(n)\le c\binom{n}{2}^{2}$ (Lemma~15 of
-Cooper--Fenner--Purewal in packing language). Two exact levels of convexity give
-$\varphi_2(21)\ge 4205$, so a box-free $2$-colouring of $[21]^3$ would need
-$21\cdot 4205=88305$ features out of the $88200$ available. Hence
-$\Ncd[3]\le 21$ for $c=2$, improving the bound $22$ obtained by the
-double-counting recursion of Cooper--Fenner--Purewal. The obstruction is exactly the
-projective plane of order $4$: at $n=21$ the continuous form of the argument is tight,
-and the improvement comes from the integrality of the row composition.
-We are explicit throughout about which of our results are new and which are
-re-derivations. Code, colourings and verification scripts are available at
+Let $N(c,d)$ denote the least $R$ such that every $c$-colouring of the grid $[R]^d$
+contains a monochromatic \emph{box}, i.e.\ a set
+$\{x_1,x_1'\}\times\cdots\times\{x_d,x_d'\}$ with $x_i\neq x_i'$ for every $i$, all of
+whose $2^d$ points share one colour. These numbers --- the cube case of the grid Ramsey
+problem for boxes --- satisfy $N(c,d)=\Theta(c^{2^d})$ with the exponent known only up to
+a factor of $d$, and almost nothing is known about their exact values.
+This note is a computational study of the case $d=3$, $c\le5$.
+
+Our main contribution is computational: \emph{explicit} box-free colourings of $[n]^3$
+with $n=23,40,44$ for $c=3,4,5$, each verified by exhaustive search over all
+$\binom{n}{2}^3$ boxes, which give $N(3,3)\ge24$, $N(4,3)\ge41$, $N(5,3)\ge45$.
+Cooper--Fenner--Purewal give the matching upper bounds $93,277,657$ for these $c$ but
+tabulate no cube colourings; we found no lower bounds for $c\ge3$ in the literature.
+
+For $c=2$ we sharpen the upper bound. Writing $\varphi_c(n)$ for the least number of
+monochromatic rectangles in a $c$-colouring of $[n]^2$, the number of features that a
+slice must use gives the necessary condition $n\varphi_c(n)\le c\binom{n}{2}^{2}$
+(Lemma~15 of Cooper--Fenner--Purewal in packing language). Two exact levels of convexity
+give $\varphi_2(21)\ge4205$, so a box-free $2$-colouring of $[21]^3$ would need
+$21\cdot4205=88305$ features out of the $88200$ available; hence $N(2,3)\le21$,
+improving the bound $22$ obtained from their double-counting recursion. The wall at
+$n=21$ is the projective plane of order $4$: at $n=21$ the continuous form of the argument
+is exactly tight, and the improvement is purely an integrality effect
+(Remark~\ref{rem:pp}).
+
+On the structural side we give a layer (feature-packing) formulation, an exact criterion
+for shift-orbit families, a dimension-raising lemma, and an exact reduction of the
+three-dimensional problem, for colourings constant on the level sets of $x+y$, to a
+two-dimensional \emph{corner} condition (Section~\ref{sec:1dshift}). We are explicit
+throughout about which statements are re-derivations of known results. Code, colourings
+and verification scripts are available at
 \url{https://github.com/dimkadimon/Ramsey}.
 \end{abstract}
 
@@ -102,9 +105,12 @@ $c\le 5$. Our contribution is deliberately stated in two parts.
 
 \emph{What is (as far as we can determine) not in the literature.}
 \begin{enumerate}[label=(\roman*)]
-\item Explicit box-free colourings of $[n]^3$ for $c=3,4,5$ with $n=23,40,44$,
-  each verified exhaustively (Section~\ref{sec:construct}); these give
-  $\Ncd[3]\ge 24,\,41,\,45$ for $c=3,4,5$. We found no tabulated cube values for $c\ge3$.
+\item \textbf{Lower bounds for $c\ge3$.} Explicit box-free colourings of $[n]^3$ for
+  $c=3,4,5$ with $n=23,40,44$, each verified exhaustively
+  (Section~\ref{sec:construct}); these give $N(3,3)\ge 24$, $N(4,3)\ge41$,
+  $N(5,3)\ge45$. \cite{CFP} tabulates no cube colourings for $c\ge3$, and we found no
+  lower bounds for these parameters elsewhere. These are the most substantial new
+  numerical statements in this note.
 \item A layer formulation (Proposition~\ref{prop:packing}) that converts the problem into
   a packing problem for monochromatic rectangles, together with measurements of how much
   of the ``feature space'' optimal colourings actually use (Table~\ref{tab:features}).
@@ -114,6 +120,11 @@ $c\le 5$. Our contribution is deliberately stated in two parts.
   explains the empirically observed barrier at $n=12$.
 \item A dimension-raising lemma (Theorem~\ref{thm:raise}) giving
   $N(2,d+1)\le N(2,d)$, hence $N(2,d)\ge 12$ for all $d\ge3$, constructively.
+\item \textbf{An exact one-dimensional-shift reduction} (Proposition~\ref{prop:1dshift}):
+  for colourings of the form $\chi(x,y,z)=f(x+y,z)$ the three-dimensional condition is
+  \emph{equivalent} to a family of two-dimensional corner conditions on the level sets of
+  $x+y$, which replaces $n^3$ free bits by $2n^2$ and puts the sum-type algebraic
+  colourings into a common framework.
 \item \textbf{An improved upper bound for the two-colour cube}: $N(2,3)\le21$
   (Theorem~\ref{thm:upper2}), against the value $22$ obtained from Lemma~4 of
   \cite{CFP}. The packing condition $n\varphi_c(n)\le c\binom{n}{2}^2$ is Lemma~15 of
@@ -135,8 +146,11 @@ $c\le 5$. Our contribution is deliberately stated in two parts.
 \item The random-colouring lower bound of Section~\ref{sec:growth} is the standard
   Lov\'asz-local-lemma/first-moment argument of \cite{CFP,ADS}.
 \end{enumerate}
-Accordingly the note should be read as an experimental-mathematics contribution with a
-few structural lemmas, not as an improvement of the known bounds for any $\Ncd$.
+Accordingly the note should be read as an experimental-mathematics contribution: the
+numerical content is the lower bounds for $c=3,4,5$ (which are new) together with a
+one-unit improvement of the $c=2$ upper bound, and the structural content is the
+collection of criteria, each of which converts a three-dimensional statement into a
+lower-dimensional one and thereby identifies where the difficulty lies.
 
 \section{A layer formulation}\label{sec:layer}
 
@@ -332,6 +346,109 @@ sensitivity check (forcing a monochromatic $2^4$ sub-block) makes the checker re
 exactly one box, so the check is not vacuous.
 \end{remark}
 
+\subsection{Reduction to one-dimensional shifts}\label{sec:1dshift}
+
+The colourings of Section~\ref{sec:construct} are produced by search, not by a formula,
+and the one algebraic colouring we know explicitly (the quadratic-residue colouring of
+$n=11$, Appendix~\ref{app:colourings}) is of \emph{sum type}: its colour is a function of
+$x+y+z$. Motivated by that we consider the family of colourings that are constant on the
+level sets of $x+y$, i.e.\ $\chi(x,y,z)=f(x+y,z)$, and show that within this family the
+three-dimensional box condition collapses to a two-dimensional one.
+
+Fix $n$ and a function $f$ on the set below, and set
+$\chi_f(x,y,z)=f(x+y,z)$ for $(x,y,z)\in[n]^3$. For a colour $\gamma$ and two levels
+$z_1\neq z_2$ put
+\[
+D_\gamma(z_1,z_2)\;=\;\bigl\{u\in[0,2n-2]\;:\;f(u,z_1)=f(u,z_2)=\gamma\bigr\}, \qquad
+f\colon[0,2n-2]\times[n]\to\{0,1\}.
+\]
+
+\begin{proposition}[Shift criterion]\label{prop:1dshift}
+$\chi_f$ is box-free if and only if for every colour $\gamma$, every $z_1<z_2$, every
+$1\le a,b\le n-1$ and every $u_0\in[0,\,2n-2-a-b]$, the four values
+$u_0,\;u_0+a,\;u_0+b,\;u_0+a+b$ are \emph{not} all contained in $D_\gamma(z_1,z_2)$.
+\end{proposition}
+
+\begin{proof}
+Let $x_1<x_2$, $y_1<y_2$, $z_1<z_2$ and put $b=x_2-x_1\ge1$, $a=y_2-y_1\ge1$ and
+$u_0=x_1+y_1$. The first coordinate $x+y$ of the eight vertices of the box takes exactly
+the values $u_0,\,u_0+a,\,u_0+b,\,u_0+a+b$, and the third coordinate takes the two values
+$z_1,z_2$. Hence the eight vertices all have colour $\gamma$ if and only if those four
+values all lie in $D_\gamma(z_1,z_2)$. (Values may coincide among the four; then some of
+the eight vertices coincide, but the box is still a box and the four values are still
+required to lie in $D_\gamma$.)
+The bounds $a,b\le n-1$ are exactly the range of the differences $y_2-y_1$ and $x_2-x_1$.
+Conversely, let $\gamma$, $z_1<z_2$, $1\le a,b\le n-1$ and $u_0\in[0,2n-2-a-b]$ be such
+that the four values lie in $D_\gamma(z_1,z_2)$. Since $x_1$ ranges over $[0,n-1-b]$ and
+$y_1$ over $[0,n-1-a]$, the sum $x_1+y_1$ ranges over all of $[0,\,2n-2-a-b]$; choose
+$x_1,y_1$ with $x_1+y_1=u_0$ and put $x_2=x_1+b$, $y_2=y_1+a$. The eight points then lie in
+$[n]^3$ and all have colour $\gamma$.
+\end{proof}
+
+\begin{corollary}\label{cor:ap}
+For every $z_1<z_2$ and colour $\gamma$ the set $D_\gamma(z_1,z_2)\subseteq[2,2n]$ is free
+of three-term arithmetic progressions (take $a=b$ in Proposition~\ref{prop:1dshift}) and
+free of corners $\{u_0,u_0+a,u_0+b,u_0+a+b\}$ with $a,b\ge1$.
+\end{corollary}
+
+Two consequences are worth recording. First, the sum-type colouring
+$\chi(x,y,z)=g(x+y+z)$ is the special case $f(u,z)=g(u+z)$ (indices reduced modulo $n$),
+so Proposition~\ref{prop:1dshift} is the natural common framework for the algebraic
+colourings. Second, the proposition replaces the $n^3$ free bits of a general colouring by
+the $2n^2$ bits of $f$, and turns each slice pair into an independent corner-freeness
+condition on a finite set --- a shape that local search can handle far better than the
+original constraint. We exploited this in the searches reported in
+Section~\ref{sec:1dsearch} and we stress that the reduction is \emph{exact}: it neither
+loses nor gains colourings, so a box-free colouring found in this family is a genuine one.
+
+\begin{remark}
+Corollary~\ref{cor:ap} should not be read as an impossibility result. It is tempting to
+conclude that the family dies at $n=9$ because a two-colouring of $[n]$ always contains a
+monochromatic three-term progression ($W(2,3)=9$); but $D_0$ and $D_1$ need not cover
+$[2,2n]$ (a value $u$ with $f(u,z_1)\neq f(u,z_2)$ belongs to neither), so no such
+conclusion follows. We record this because an earlier version of our notes contained the
+erroneous claim that the family is empty for $n\ge9$.
+\end{remark}
+
+\subsection{Search in the shift family}\label{sec:1dsearch}
+
+Proposition~\ref{prop:1dshift} is a constraint satisfaction problem in $2n^2$ bits
+($2n-1$ values of $u$ times $n$ values of $z$), with one forbidden configuration per
+colour, per pair $z_1<z_2$, per $1\le a,b\le n-1$ and per admissible $u_0$. Each
+forbidden configuration is a clause over eight variables, so the instance has $O(n^5)$
+clauses of width eight and only $2n^2$ variables; for $n=14$ this is $378$ variables and
+$399\,854$ clauses, against $14^3=2744$ variables and $1.5\times10^6$ clauses for the
+direct encoding of the original problem. We solved these instances with a CDCL solver
+(CaDiCaL, via \texttt{python-sat}).
+
+Two checks fix the meaning of the results. First, the sum-type colouring
+$\chi(x,y,z)=g(x+y+z)$ is the case $f(u,z)=g(u+z)$; for $n=11$ with $g$ the quadratic
+residues mod $11$ the criterion evaluates to zero violations, and the solver re-finds a
+box-free colouring of $[11]^3$ inside the family in $53$~s. Second, every colouring
+returned is re-verified from the definition by an independent checker
+(\texttt{core.is\_valid\_fast}), which scans all $\binom{n}{2}^3$ boxes. The family
+therefore neither loses nor manufactures colourings, as claimed in
+Section~\ref{sec:1dshift}.
+
+\begin{remark}
+The bound $b\le n-1$ in Proposition~\ref{prop:1dshift} is not cosmetic. An earlier
+version of the criterion imposed only $a,b\ge1$, which is \emph{strictly stronger}: for
+$n=11$ it assigns $360$ violations to the genuine colouring of
+Appendix~\ref{app:colourings} and thereby rejects it, because it admits configurations
+such as $a=1$, $b=11$ whose ``difference in $x$'' exceeds the width of the grid. We
+mention this because the failure is silent --- the criterion remains sufficient, so a
+search based on it returns only valid colourings and the error is invisible unless one
+tests it against a known example.
+\end{remark}
+
+For local search the useful identity is the following. For a set $D$ of positions and
+integers $a,b\ge1$, the number of violating configurations with those $a,b$ is
+$|D\cap(D-a)\cap(D-b)\cap(D-a-b)|$, and summing over \emph{all} $b\ge1$ gives
+$\binom{|D\cap(D-a)|}{2}$, so the unbounded violation count is computable with $O(n)$
+bit operations. With the truncation $b\le n-1$ a direct double loop over $(a,b)$ is
+needed, but each $D$ is then a bitmask and the whole cost of a state is a few thousand
+popcount operations.
+
 \section{Upper bounds}\label{sec:upper}
 
 \subsection{A Zarankiewicz argument}
@@ -518,11 +635,23 @@ different idea.
 
 \begin{enumerate}[label=(\arabic*)]
 \item \textbf{Exact values.} Not a single $\Ncd[3]$ with $c\ge2$ is known. The most
-  accessible target is $N(2,3)\in[13,21]$: on the lower side one needs a box-free
-  2-colouring of some $[n]^3$, $13\le n\le21$, that is not of shift-orbit type (all such
-  families fail at $n=12$); on the upper side one needs a stronger counting argument, most
-  plausibly an improvement of the $C_4$ bound $Z_2(n)$ beyond Kővári--Sós--Turán, which is
-  tight only at $n=q^2+q+1$.
+  accessible target is $N(2,3)\in[13,21]$. On the lower side one needs a box-free
+  2-colouring of some $[n]^3$ with $13\le n\le20$. On the upper side Theorem~\ref{thm:upper2}
+  shows that the binding quantity is $\varphi_2(n)$, the least number of monochromatic
+  rectangles in a 2-colouring of $[n]^2$: by \eqref{eq:pack} any improvement of the lower
+  bound $\varphi_2(n)\ge\mu(T_0,\binom{n}{2})+\mu(T_1,\binom{n}{2})$ that pushes
+  $n\varphi_2(n)$ past $2\binom{n}{2}^2$ for some smaller $n$ immediately lowers
+  $N(2,3)$. Our convexity bound is loose by roughly a factor of two already at $n=5$
+  ($1$ against the exact value $2$), so there is room. Determining $\varphi_2(n)$ exactly
+  --- the bipartite Ramsey multiplicity of $C_4$ --- is a self-contained two-dimensional
+  problem and, in our view, the cleanest route to a better upper bound.
+\item \textbf{Beyond the shift family.} Proposition~\ref{prop:1dshift} and
+  Section~\ref{sec:1dsearch} reduce the three-dimensional problem, for colourings constant
+  on the level sets of $x+y$, to a two-dimensional corner condition. The natural next step
+  is the family of colourings constant on the level sets of a general linear form,
+  $\chi(x,y,z)=f(\alpha x+\beta y,z)$, or of two independent forms; each such choice
+  yields its own clause set and its own notion of forbidden configuration, and we have not
+  explored whether one of them is large enough to contain a colouring with $n\ge13$.
 \item \textbf{Permutation families.} Replacing the cyclic shifts in \eqref{eq:shift} by
   arbitrary per-slice permutations $\pi_x$ of $[n]$ gives a family to which the orbit
   argument does not apply. A pigeonhole estimate shows that a random permutation family
@@ -563,7 +692,13 @@ $c=2$ lower bound is implied by \cite[Fig.~3]{CFP}, and that the earlier draft's
 $N(2,3)\le22$ as a new result was wrong; the improvement to $21$ (Theorem~\ref{thm:upper2})
 was found by the AI agent, which also wrote the standalone certificate
 \texttt{code/final\_bound.py} for it; that certificate is short enough to be checked by
-hand and is the artifact the author should verify before submission. Every computational
+hand and is the artifact the author should verify before submission. The AI agent also
+proposed the shift reduction of Section~\ref{sec:1dshift} and its search form, and ---
+more usefully --- the record of one failure: the first version of
+Proposition~\ref{prop:1dshift} omitted the bound $a,b\le n-1$, which made the criterion
+strictly stronger than necessary; the error was detected only because the criterion was
+tested against the known $n=11$ colouring, which it wrongly rejected
+(Remark after Proposition~\ref{prop:1dshift}). Every computational
 claim was checked by two independent verifiers as described in
 Section~\ref{sec:construct}, and all proofs are written out in full so that they can be
 checked by a human reader.
