@@ -642,9 +642,14 @@ different idea.
   bound $\varphi_2(n)\ge\mu(T_0,\binom{n}{2})+\mu(T_1,\binom{n}{2})$ that pushes
   $n\varphi_2(n)$ past $2\binom{n}{2}^2$ for some smaller $n$ immediately lowers
   $N(2,3)$. Our convexity bound is loose by roughly a factor of two already at $n=5$
-  ($1$ against the exact value $2$), so there is room. Determining $\varphi_2(n)$ exactly
-  --- the bipartite Ramsey multiplicity of $C_4$ --- is a self-contained two-dimensional
-  problem and, in our view, the cleanest route to a better upper bound.
+  ($1$ against the exact value $2$, which we verified by exhaustive enumeration of column
+  multisets), so there is room. The \emph{threshold} version of $\varphi_2$ is classical:
+  $\varphi_2(n)=0$ for $n\le4$ and $\varphi_2(n)\ge1$ for $n\ge5$, the latter being the
+  bipartite Ramsey number $r(C_4,C_4)=5$. What is not, to our knowledge, tabulated is the
+  multiplicity $\varphi_2(n)$ itself for $n\ge6$. Determining it exactly is a
+  self-contained two-dimensional problem --- the bipartite analogue of the Ramsey
+  multiplicity problem --- and it is the quantity that Theorem~\ref{thm:upper2} makes
+  binding.
 \item \textbf{Beyond the shift family.} Proposition~\ref{prop:1dshift} and
   Section~\ref{sec:1dsearch} reduce the three-dimensional problem, for colourings constant
   on the level sets of $x+y$, to a two-dimensional corner condition. The natural next step
